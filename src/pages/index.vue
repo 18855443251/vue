@@ -3,7 +3,7 @@
         <h1>你好</h1>
         <p class="text">
             尊敬的
-            <span style="color: red;">用户</span>，欢迎来到德莱联盟！
+            <span style="color: red;">{{memberInfo}}用户</span>，欢迎来到德莱联盟！
         </p>
 
         <div class>
@@ -20,7 +20,7 @@
 
 <script>
 import card from "../components/card";
-
+import { mapGetters, mapState } from "vuex";
 export default {
     components: {
         card
@@ -41,7 +41,8 @@ export default {
                 title: "学习vuex",
                 description: "2312",
                 charge: "",
-                permission: ""
+                userStatus: 0,
+                vipLevel: 0
             },
             {
                 id: "2",
@@ -50,7 +51,8 @@ export default {
                 title: "实战课程",
                 description: "2312",
                 charge: "实战课程",
-                permission: "vip"
+                userStatus: 1,
+                vipLevel: 0
             },
             {
                 id: "3",
@@ -59,9 +61,14 @@ export default {
                 title: "v12会员专享课程",
                 description: "2312",
                 charge: "v12会员专享",
-                permission: 12
+                userStatus: 2,
+                vipLevel: 12
             }
         ];
+    },
+    computed: {
+        ...mapState(["userStatus", "vipLevel"]),
+        ...mapGetters(["memberInfo"])
     },
     mounted() {},
     methods: {
@@ -69,28 +76,29 @@ export default {
             this.$router.push("./userCenter");
         },
         goVideoList(e) {
-            const r = this.checkPermission(e.permission);
-            if (r) {
-                alert(r);
-            } else {
+            const res = this.checkPermission(e);
+            if (res) {
                 this.$router.push({
                     name: "course",
                     params: {
                         id: e.id
                     }
                 });
+            } else {
+                alert("权限不足，无法观看");
             }
         },
-        checkPermission(p) {
-            if (!p) return "";
-            if (p === "vip") {
-                if (this.userStatus !== "vip") {
-                    return "您不是vip，无权观看";
+        checkPermission(e) {
+            const userStatus = this.$store.state.userStatus;
+            const vipLevel = this.$store.state.vipLevel;
+            if (userStatus >= e.userStatus) {
+                if (vipLevel >= e.vipLevel) {
+                    return true;
+                } else {
+                    return false;
                 }
-            } else if (typeof p === "number") {
-                if (this.vipLevel < p) {
-                    return "您的vip等级不够，无权观看";
-                }
+            } else {
+                return false;
             }
         }
     }

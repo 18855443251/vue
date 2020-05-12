@@ -4,11 +4,11 @@
         <div class>
             <section class="user-info">
                 <label for class="user-info-label">账号</label>
-                <span class="user-info-value"></span>
+                <span class="user-info-value">{{userInfo.account}}</span>
             </section>
             <section class="user-info">
                 <label for class="user-info-label">身份</label>
-                <span class="user-info-value"></span>
+                <span class="user-info-value">{{memberInfo}}</span>
             </section>
             <section class="vip-list">
                 <ul class="container">
@@ -29,6 +29,8 @@
 </template>
 
 <script>
+import store from "../store";
+import { mapState, mapGetters } from "vuex";
 export default {
     data() {
         return {
@@ -37,17 +39,45 @@ export default {
     },
     mounted() {
         this.vipList = [
-            { name: "普通会员", charge: "10.00", value: "vip", key: "vip" },
-            { name: "VIP1会员", charge: "50.00", value: "1", key: "level" },
-            { name: "VIP3会员", charge: "100.00", value: "3", key: "level" },
-            { name: "VIP9会员", charge: "1000.00", value: "9", key: "level" },
-            { name: "VIP12会员", charge: "10000.00", value: "12", key: "level" }
+            { name: "vip会员", charge: "10.00", vipLevel: 0, userStatus: 1 },
+            {
+                name: "高级VIP1会员",
+                charge: "50.00",
+                vipLevel: 1,
+                userStatus: 2
+            },
+            {
+                name: "高级VIP3会员",
+                charge: "100.00",
+                vipLevel: 3,
+                userStatus: 2
+            },
+            {
+                name: "高级VIP9会员",
+                charge: "1000.00",
+                vipLevel: 9,
+                userStatus: 2
+            },
+            {
+                name: "高级VIP12会员",
+                charge: "10000.00",
+                vipLevel: 12,
+                userStatus: 2
+            }
         ];
+    },
+    computed: {
+        ...mapState(["userInfo"]),
+        ...mapGetters(["memberInfo"])
     },
     methods: {
         recharge() {},
         upgrade() {},
-        buy() {}
+        buy(e) {
+            store.dispatch("buyVip", e).then(res => {
+                alert(res);
+            });
+        }
     }
 };
 </script>
